@@ -6,21 +6,23 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
-      - name: Download and unzip ngrok
+      - name: Setup ngrok & expose port 3389
         run: |
           Invoke-WebRequest https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
           Expand-Archive ngrok.zip -DestinationPath ngrok
           cd ngrok
           .\ngrok.exe authtoken ${{ secrets.NGROK_AUTH_TOKEN }}
 
-      - name: Enable RDP and start ngrok tunnel
+      - name: Enable RDP
         run: |
           net user kamel123 MyStrong123 /add
           net localgroup administrators kamel123 /add
-          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name 'fDenyTSConnections' -Value 0
+          Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server" -Name "fDenyTSConnections" -Value 0
           Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+
+      - name: Start ngrok and show RDP address
+        run: |
           cd ngrok
-          Start-Process powershell -ArgumentList "-NoExit", "-Command", ".\ngrok.exe tcp 3389"
-          Start-Sleep -Seconds 5
-          Invoke-WebRequest http://127.0.0.1:4040/api/tunnels -OutFile tunnels.json
-          Get-Content tunnels.json
+          .\ngrok.exe tcp 3389 > ..\rdp.txt &
+          Start-Sleep -Seconds 10
+          Get-Content ..\rdp.txt
