@@ -25,7 +25,7 @@ jobs:
 
     - name: Create RDP User
       run: |
-        net user kamel007 kamel007 /add /Y
+        net user kamel007 MyStrong123 /add /Y
         net localgroup administrators kamel007 /add
         reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\SpecialAccounts\UserList" /v kamel007 /t REG_DWORD /d 0 /f
 
@@ -65,7 +65,7 @@ jobs:
         Write-Output "=========================================="
         Write-Output "Address: $tunnelUrl"
         Write-Output "Username: kamel007"
-        Write-Output "Password: kamel007"
+        Write-Output "Password: MyStrong123"
         Write-Output "------------------------------------------"
         Write-Output "1. Open Remote Desktop (Win+R → mstsc)"
         Write-Output "2. Connect to: $tunnelUrl"
