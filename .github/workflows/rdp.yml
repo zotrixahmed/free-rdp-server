@@ -1,24 +1,21 @@
 name: RDP
 
-on:
-  workflow_dispatch:
+on: [workflow_dispatch]
 
 jobs:
   build:
     runs-on: windows-latest
-
     steps:
-      - name: Enable RDP Access
+      - name: Download ngrok
         run: |
-          net user runneradmin MyStrongPassword123 /add
-          net localgroup administrators runneradmin /add
-          vssadmin resize shadowstorage /For=C: /On=C: /MaxSize=10%
-          Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server" -Name "fDenyTSConnections" -Value 0
-          Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+          Invoke-WebRequest https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
+          Expand-Archive ngrok.zip
+          ./ngrok.exe authtoken 2zKLBncO1h1NGbZy8zufjx8hhTY_6W9N1NN65AVtbRA5htyw
 
-      - name: Keep Alive for 6 Hours
+      - name: Enable RDP
         run: |
-          for /l %%x in (1, 1, 360) do (
-            echo Running %%x...
-            timeout /t 60
-          )
+          net user kamel123 MyStrong123 /add
+          net localgroup administrators kamel123 /add
+          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name 'fDenyTSConnections' -Value 0
+          Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+          ./ngrok.exe tcp 3389
